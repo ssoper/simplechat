@@ -1,0 +1,9 @@
+.DS_Store
+node_modules
+*.log
+config/**/private.pem
+*.insecure
+cookies.txt
+cookies
+docs/tmp
+docs/*.html

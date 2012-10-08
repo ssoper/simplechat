@@ -1,0 +1,28 @@
+!!! 5
+html(lang='en')
+  head
+    title SimpleChat
+
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap-responsive.min.css')
+    link(rel='stylesheet', href='/stylesheets/font-awesome.css')
+    link(rel='stylesheet', href='/stylesheets/styles.css')
+    script(src='/javascripts/tap.js')
+    script(src='/javascripts/superagent.min.js')
+    script(src='/javascripts/moment.min.js')
+    script(src='/javascripts/utilities.js')
+    script
+      document.addEventListener('DOMContentLoaded', function() {
+        // Nothing yet
+      });
+  body
+    .container-fluid
+      .row-fluid.chat
+        .span10.chat.display
+          p Display
+        .span2.chat.users
+          p Users
+      .row-fluid.entry
+        .span12.chat.entry
+          p Entry
