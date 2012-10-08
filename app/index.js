@@ -1,5 +1,7 @@
 var express = require('express'),
-    http = require('http')
+    http = require('http'),
+    mw = require('./middleware'),
+    routes = require('./routes');
 
 function App() {
   this.app = null;
@@ -36,9 +38,7 @@ App.prototype.listen = function(port) {
 
   console.log('Server listening on port ' + port);
 
-  this.app.get('/', function(req, res) {
-    res.render('index');
-  });
+  this.app.get('/', routes.index);
 }
 
 App.prototype.stop = function() {
