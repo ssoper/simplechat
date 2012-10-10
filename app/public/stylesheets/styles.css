@@ -1,24 +1,11 @@
-/*
-.chat {
-  margin: 0;
-  padding: 0;
-}
-
 .chat.display, .chat.users {
   border-right: 1px solid black;
-  height: 500px;
-}
-
-.chat.users {
-  height: 500px;
 }
 
 .chat.entry {
   border: 1px solid black;
   border-left: none;
-  height: 100px;
 }
-*/
 
 body, html {
   height: 100%;
@@ -42,20 +29,20 @@ body, html {
 }
 
 .chat.display {
-  background-color: pink;
+/*  background-color: pink;*/
   height: 100%;
   min-height: 100%;
 }
 
 .chat.users {
-  background-color: green;
+/*  background-color: green;*/
   height: 100%;
   min-height: 100%;
   display: block;
 }
 
 .chat.entry {
-  background-color: blue;
+/*  background-color: blue;*/
   height: 100%;
   min-height: 100%;
 }

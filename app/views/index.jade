@@ -9,20 +9,49 @@ html(lang='en')
     link(rel='stylesheet', href='/stylesheets/styles.css')
     script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')
     script(src='/javascripts/bootstrap.min.js')
-    script(src='/javascripts/tap.js')
     script(src='/javascripts/superagent.min.js')
     script(src='/javascripts/moment.min.js')
+    script(src='/javascripts/socket.io.min.js')
+    script(src='/javascripts/tap.js')    
     script(src='/javascripts/utilities.js')
     script
       document.addEventListener('DOMContentLoaded', function() {
-        // Nothing yet
+        var socket = io.connect('http://localhost');
+        socket.emit('join', { room: 'tenforward', user: 'User_' + parseInt(Math.random()*1000) });
+        
+        socket.on('joined', function(data) {
+          var ul = document.querySelector('.chat.users ul');
+          
+          var li = function(user) {
+            var li = document.createElement('li');
+            li.id = user;
+            var content = document.createTextNode(user);
+            li.appendChild(content);
+            return li;
+          };
+          
+          if (data.user) {
+            if (data.index == ul.childNodes.length) {
+              ul.appendChild(li(data.user));
+            } else {
+              ul.insertBefore(li(data.user), ul.childNodes[data.index]);
+            }
+          } else if (data.users) {
+            data.users.forEach(function(user) {
+              ul.appendChild(li(user));        
+            });
+          }
+        });
+        
+        socket.on('exited', function(data) {
+          var ul = document.querySelector('.chat.users ul');
+          ul.removeChild(ul.childNodes[data.index]);
+        });
       });
   body
     .row-fluid.chat
       .span10.chat.display
-        p Display
       .span2.chat.users
-        p Users
+        ul
     .row-fluid.entry
       .span12.chat.entry
-        p Entry
