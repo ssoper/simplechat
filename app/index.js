@@ -6,7 +6,8 @@ var express = require('express'),
     async = require('async'),
     io = require('socket.io').listen(server),
     mw = require('./middleware'),
-    routes = require('./routes');
+    routes = require('./routes'),
+    chat = require('./lib/chat')
 
 function App() {
 
@@ -35,34 +36,21 @@ App.prototype.listen = function(port) {
 
   console.log('Server listening on port ' + port);
 
-  var getScore = function(username) {
-    var normalized = username.replace(/\s/g, '').toLowerCase();
-    var score = 0;
-    for (var i=0; i < normalized.length; i++) {
-      score += normalized.charCodeAt(i);
-    }
-
-    return score;
-  }
-
   app.get('/', routes.index);
   io.sockets.on('connection', function(socket) {
     var pubsub = redis.createClient();
-    var client = redis.createClient();
     var user, rooms = [];
 
     socket.on('join', function(data) {
-      client.zadd(data.room, getScore(data.user), data.user, function(err) {
-        rooms.push(data.room);
-        user = data.user;
-        client.zrank(data.room, data.user, function(err, index) {
-          client.publish(data.room, JSON.stringify({ type: 'joined', payload: { user: data.user, index: index }}), function(err) {
-            pubsub.subscribe(data.room, function(err) {
-              client.zrange(data.room, 0, -1, function(err, users) {
-                socket.emit('joined', { users: users, room: data.room });
-              });
-            });
-          });
+      rooms.push(data.room);
+      user = data.user;
+
+      chat.join(data.user, data.room, function(err, result) {
+        if (err)
+          return socket.emit('error', err);
+
+        pubsub.subscribe(result.room, function(err) {
+          socket.emit('joined', result);
         });
       });
     });
@@ -83,25 +71,20 @@ App.prototype.listen = function(port) {
     });
 
     socket.on('sendMessage', function(data) {
-      client.publish(data.room, JSON.stringify({ type: 'messaged', payload: { user: user, createdAt: new Date(), message: data.message }}));
+      chat.sendMessage(user, data.room, data.message);
     });
 
     socket.on('disconnect', function() {
       async.forEach(rooms, function(room, cb) {
-        pubsub.unsubscribe(room, function(err) {
-          client.zrank(room, user, function(err, index) {
-            client.publish(room, JSON.stringify({ type: 'exited', payload: { user: user, index: index }}), function(err) {
-              client.zrem(room, user, function(err, done) {
-                client.quit();
-                pubsub.quit();
-                cb();
-              });
-            });
+        chat.leave(user, room, function(err, result) {
+          pubsub.unsubscribe(room, function(err) {
+            cb();
           });
         });
+      }, function(err) {
+        pubsub.quit();
       });
     });
-
   });
 }
 
