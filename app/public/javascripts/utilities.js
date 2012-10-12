@@ -1,5 +1,8 @@
 var hasClass = function(klassName) {
-  return (this.getAttribute('class').split(' ').indexOf(klassName) > -1);
+  if (this.getAttribute('class'))
+    return (this.getAttribute('class').split(' ').indexOf(klassName) > -1);
+  this.setAttribute('class', '');
+  return false;
 }
 
 Element.prototype.hasClass = hasClass;

@@ -83,7 +83,7 @@ App.prototype.listen = function(port) {
     });
 
     socket.on('sendMessage', function(data) {
-      client.publish(data.room, { type: 'messaged', payload: data.message });
+      client.publish(data.room, JSON.stringify({ type: 'messaged', payload: { user: user, createdAt: new Date(), message: data.message }}));
     });
 
     socket.on('disconnect', function() {
