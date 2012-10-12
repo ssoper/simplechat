@@ -55,6 +55,28 @@ App.prototype.listen = function(port) {
       });
     });
 
+    socket.on('sendMessage', function(data) {
+      var replyTo = data.message.split(' ')[0];
+      chat.find(replyTo, data.room, function(err, found) {
+        if (found)
+          return chat.reply(user, data.room, replyTo, data.message.split(' ').slice(1).join(' '));
+
+        return chat.sendMessage(user, data.room, data.message);
+      });
+    });
+
+    socket.on('disconnect', function() {
+      async.forEach(rooms, function(room, cb) {
+        chat.leave(user, room, function(err, result) {
+          pubsub.unsubscribe(room, function(err) {
+            cb();
+          });
+        });
+      }, function(err) {
+        pubsub.quit();
+      });
+    });
+
     pubsub.on('message', function(room, encoded) {
       var data = JSON.parse(encoded);
       switch (data.type) {
@@ -69,27 +91,11 @@ App.prototype.listen = function(port) {
           break;
       }
     });
-
-    socket.on('sendMessage', function(data) {
-      chat.sendMessage(user, data.room, data.message);
-    });
-
-    socket.on('disconnect', function() {
-      async.forEach(rooms, function(room, cb) {
-        chat.leave(user, room, function(err, result) {
-          pubsub.unsubscribe(room, function(err) {
-            cb();
-          });
-        });
-      }, function(err) {
-        pubsub.quit();
-      });
-    });
   });
 }
 
 App.prototype.stop = function() {
-  console.log('Shutting down server')
+  console.log('Shutting down server');
   server.close();
 }
 

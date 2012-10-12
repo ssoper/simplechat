@@ -35,6 +35,25 @@ function Chat() {
     });    
   }
 
+  this.find = function(user, room, cb) {
+    client.zscore(room, user, function(err, score) {
+      if (err)
+        return cb(err);
+
+      return cb(null, score);
+    })
+  }
+
+  var publish = function(room, data, cb) {
+    client.publish(room, JSON.stringify(data), function(err, result) {
+      if (cb) {
+        if (err)
+          return cb(err);
+        return cb(null, result);
+      }
+    });
+  }
+
   this.sendMessage = function(user, room, message, cb) {
     var data = {
       type: 'messaged',
@@ -45,13 +64,21 @@ function Chat() {
       }
     };
 
-    client.publish(room, JSON.stringify(data), function(err, result) {
-      if (cb) {
-        if (err)
-          return cb(err);
-        return cb(null, result);
+    return publish(room, data, cb);
+  }
+
+  this.reply = function(user, room, replyTo, message, cb) {
+    var data = {
+      type: 'messaged',
+      payload: {
+        user: user,
+        replyTo: replyTo,
+        createdAt: new Date(),
+        message: message
       }
-    });
+    };
+
+    return publish(room, data, cb);
   }
 
   this.leave = function(user, room, cb) {

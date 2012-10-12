@@ -33,6 +33,23 @@ body, html {
   min-height: 100%;
 }
 
+.chat.display p:first-child {
+  margin-top: 10px;
+}
+
+.chat.display p {
+  margin-left: 10px;
+  margin-bottom: 0px;
+}
+
+.chat.display p .user {
+  font-weight: bold;
+}
+
+.chat.display .replyTo {
+  color: red;
+}
+
 .chat.users {
   height: 100%;
   min-height: 100%;
@@ -78,17 +95,4 @@ body, html {
   box-shadow: none;
   font-weight: bold;
   font-size: 18pt;
-}
-
-.chat.display p:first-child {
-  margin-top: 10px;
-}
-
-.chat.display p {
-  margin-left: 10px;
-  margin-bottom: 0px;
-}
-
-.chat.display p .user {
-  font-weight: bold;
 }

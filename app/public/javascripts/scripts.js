@@ -56,8 +56,16 @@ document.addEventListener('DOMContentLoaded', function() {
     userSpan.appendChild(document.createTextNode(' ' + data.user));
 
     var messageSpan = document.createElement('span');
-    messageSpan.addClass('message');
-    messageSpan.appendChild(document.createTextNode(': ' + data.message));
+    messageSpan.addClass('message')
+    messageSpan.appendChild(document.createTextNode(':'));
+    if (data.replyTo) {
+      var replyToSpan = document.createElement('span');
+      replyToSpan.addClass('replyTo');
+      replyToSpan.appendChild(document.createTextNode(' ' + data.replyTo));
+      messageSpan.appendChild(replyToSpan);
+    }
+
+    messageSpan.appendChild(document.createTextNode(' ' + data.message));
 
     var p = document.createElement('p');
     p.appendChild(createdAtSpan);
