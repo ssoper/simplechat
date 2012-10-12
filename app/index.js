@@ -58,7 +58,7 @@ App.prototype.listen = function(port) {
     socket.on('sendMessage', function(data) {
       var replyTo = data.message.split(' ')[0];
       chat.find(replyTo, data.room, function(err, found) {
-        if (found)
+        if (found && replyTo != user)
           return chat.reply(user, data.room, replyTo, data.message.split(' ').slice(1).join(' '));
 
         return chat.sendMessage(user, data.room, data.message);

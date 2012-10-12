@@ -65,14 +65,27 @@ document.addEventListener('DOMContentLoaded', function() {
       messageSpan.appendChild(replyToSpan);
     }
 
-    messageSpan.appendChild(document.createTextNode(' ' + data.message));
+    if (data.message.match(/\n/)) {
+      var count = 0;
+      data.message.split('\n').forEach(function(msg) {
+        if (count == 0)
+          messageSpan.appendChild(document.createTextNode(' '));
+        messageSpan.appendChild(document.createTextNode(msg));
+        messageSpan.appendChild(document.createElement('br'));
+        count++;
+      });
+    } else {
+      messageSpan.appendChild(document.createTextNode(' ' + data.message));
+    }
 
     var p = document.createElement('p');
     p.appendChild(createdAtSpan);
     p.appendChild(userSpan);
     p.appendChild(messageSpan);
 
-    document.querySelector('.chat.display').appendChild(p);
+    var chat = document.querySelector('.chat.display');
+    chat.appendChild(p);
+    chat.scrollTop = chat.scrollHeight;
   });
 
   var input = document.querySelector('.chat.entry input');

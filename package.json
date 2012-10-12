@@ -14,7 +14,9 @@
     "lodash": "~0.8",
     "request": "~2.11",
     "moment": "1.6.2",
-    "redis": "~0.8"
+    "redis": "~0.8",
+    "hubot-simplechat": "*",
+    "hubot": "2.3.x"
   },
   "devDependencies": {
   }
