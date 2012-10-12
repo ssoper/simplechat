@@ -39,6 +39,24 @@ body, html {
   display: block;
 }
 
+.chat.users ul {
+  margin: 5px 0 0 5px;
+}
+
+.chat.users li {
+  list-style: none;
+}
+
+.chat.users .leaving {
+  font-style: italic;
+  font-weight: normal !important;
+  color: gray;
+}
+
+.chat.users .joining {
+  font-weight: bold;
+}
+
 .chat.entry {
   height: 100%;
   min-height: 100%;

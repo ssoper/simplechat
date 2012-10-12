@@ -59,7 +59,7 @@ App.prototype.listen = function(port) {
           client.publish(data.room, JSON.stringify({ type: 'joined', payload: { user: data.user, index: index }}), function(err) {
             pubsub.subscribe(data.room, function(err) {
               client.zrange(data.room, 0, -1, function(err, users) {
-                socket.emit('joined', { users: users });
+                socket.emit('joined', { users: users, room: data.room });
               });
             });
           });
