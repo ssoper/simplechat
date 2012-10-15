@@ -8,6 +8,7 @@ html(lang='en')
     link(rel='stylesheet', href='/stylesheets/font-awesome.css')
     link(rel='stylesheet', href='/stylesheets/styles.css')
     script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/lodash.js/0.8.2/lodash.min.js')
     script(src='/javascripts/bootstrap.min.js')
     script(src='/javascripts/superagent.min.js')
     script(src='/javascripts/moment.min.js')
@@ -26,4 +27,5 @@ html(lang='en')
           span.shell
             | >
           form(style='display: inline')
+            input#suggestion(type='text')
             input(type='text')

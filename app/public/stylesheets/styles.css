@@ -38,7 +38,7 @@ body, html {
   margin-top: 10px;
 }
 
-.chat.display p {
+.chat.display > * {
   margin-left: 10px;
   margin-bottom: 0px;
 }
@@ -91,9 +91,22 @@ body, html {
 
 .chat.entry input {
   width: 78%;
-  height: 50%;
+  height: 29px;
   border: none;
   box-shadow: none;
   font-weight: bold;
   font-size: 18pt;
+}
+
+.chat.entry input:first-child {
+  color: gray;
+  z-index: 0;
+}
+
+.chat.entry input:last-child {
+  margin-top: -69px;
+  margin-left: 13.5px;
+  color: black;
+  background: transparent;
+  z-index: 10;
 }

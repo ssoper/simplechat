@@ -4,6 +4,7 @@ var express = require('express'),
     server = http.createServer(app),
     redis = require('redis'),
     async = require('async'),
+    lodash = require('lodash'),
     io = require('socket.io').listen(server),
     mw = require('./middleware'),
     routes = require('./routes'),
@@ -39,7 +40,7 @@ App.prototype.listen = function(port) {
   app.get('/', routes.index);
   io.sockets.on('connection', function(socket) {
     var pubsub = redis.createClient();
-    var user, rooms = [];
+    var user, rooms = [], history = [];
 
     socket.on('join', function(data) {
       rooms.push(data.room);
@@ -57,12 +58,23 @@ App.prototype.listen = function(port) {
 
     socket.on('sendMessage', function(data) {
       var replyTo = data.message.split(' ')[0];
+      history.unshift(data.message);
+      if (history.length > 15) {
+        history.pop();
+      }
+
       chat.find(replyTo, data.room, function(err, found) {
         if (found && replyTo != user)
           return chat.reply(user, data.room, replyTo, data.message.split(' ').slice(1).join(' '));
 
         return chat.sendMessage(user, data.room, data.message);
       });
+    });
+
+    socket.on('partial', function(partial) {
+      var found = lodash.find(history, function(cmd) { return cmd.match(new RegExp('^'+ partial)) });
+      if (found)
+        socket.emit('autocomplete', found);
     });
 
     socket.on('disconnect', function() {

@@ -65,17 +65,59 @@ document.addEventListener('DOMContentLoaded', function() {
       messageSpan.appendChild(replyToSpan);
     }
 
+    var parseMedia = function(message, cb) {
+      var total = message.split(' ').length;
+      var nodes = [];
+      var done = function(media) {
+        if (media)
+          nodes.push(media);
+        if (total == 0)
+          cb(nodes);
+      }
+
+      message.split(' ').forEach(function(word) {
+        if (word.match(/\.(png|jpg|jpeg|gif)$/)) {
+          var img = $('<img>');
+          img.attr('src', word).load(function() {
+            total--;
+            done({ media: img, width: img[0].naturalWidth, height: img[0].naturalHeight });
+          });
+        } else {
+          total--;
+          done();
+        }
+      });
+    }
+
+    var parseLinks = function(message) {
+      return _.map(message.split(' '), function(word) {
+        if (word.match(/^http:\/\//)) {
+          var node = document.createElement('a');
+          node.setAttribute('href', word);
+          node.setAttribute('target', '_blank');
+          node.appendChild(document.createTextNode(word));
+          return node;
+        } else {
+          return document.createTextNode(word);
+        }
+      });
+    };
+
     if (data.message.match(/\n/)) {
       var count = 0;
       data.message.split('\n').forEach(function(msg) {
-        if (count == 0)
+        if (count == 0) {
           messageSpan.appendChild(document.createTextNode(' '));
+        }
         messageSpan.appendChild(document.createTextNode(msg));
         messageSpan.appendChild(document.createElement('br'));
         count++;
       });
     } else {
-      messageSpan.appendChild(document.createTextNode(' ' + data.message));
+      parseLinks(data.message).forEach(function(node) {
+        messageSpan.appendChild(document.createTextNode(' '));
+        messageSpan.appendChild(node);
+      });
     }
 
     var p = document.createElement('p');
@@ -83,21 +125,60 @@ document.addEventListener('DOMContentLoaded', function() {
     p.appendChild(userSpan);
     p.appendChild(messageSpan);
 
+    var chat = $('.chat.display');
+    chat.append(p);
+    chat[0].scrollTop = chat[0].scrollHeight;
+
+    parseMedia(data.message, function(media) {
+      var height = 0;
+      media.forEach(function(item) {
+        chat.append(item.media);
+        height += item.height;
+      });
+      chat[0].scrollTop += height;
+    });
+  });
+
+  var input = document.querySelector('.chat.entry input:last-child');
+  input.focus();
+
+  document.querySelector('.chat.display').addEventListener('DOMSubtreeModified', function() {
     var chat = document.querySelector('.chat.display');
-    chat.appendChild(p);
     chat.scrollTop = chat.scrollHeight;
   });
 
-  var input = document.querySelector('.chat.entry input');
-  input.focus();
+  document.addEventListener('keydown', function(evt) {
+    if (input !== document.activeElement)
+      return false;
 
-  document.querySelector('.chat.entry form').addEventListener('submit', function(evt) {
-    var message = input.value
-    if (message.length > 0) {
-      socket.emit('sendMessage', { room: room, message: message });
+    var message = input.value.trim();
+
+    if (evt.keyCode == 13) { // Submit
+      if (message.length > 0) {
+        socket.emit('sendMessage', { room: room, message: message });
+      }
+      input.value = '';
+      evt.preventDefault();
+      return false;
+    } else if (evt.keyCode == 9) { // Tab autocomplete
+      var suggested = document.querySelector('#suggestion').value;
+      document.querySelector('#suggestion').value = '';
+      input.value = suggested;
+      evt.preventDefault();
+      return false;
+    } else if (message.length == 3) { // Partial
+      socket.emit('partial', message);
+      return false;
+    } else if (message.length > 3 && 
+               document.querySelector('#suggestion').value.length > 0 &&
+               !document.querySelector('#suggestion').value.match(message)) {
+      document.querySelector('#suggestion').value = '';
     }
-    input.value = '';
-    evt.preventDefault();
-    return false;
   }, false);
+
+  socket.on('autocomplete', function(cmd) {
+    if (cmd) {
+      document.querySelector('#suggestion').value = cmd;
+    }
+  });
 });
