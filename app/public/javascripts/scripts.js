@@ -82,6 +82,10 @@ document.addEventListener('DOMContentLoaded', function() {
             total--;
             done({ media: img, width: img[0].naturalWidth, height: img[0].naturalHeight });
           });
+        } else if (word.match(/http:\/\/[^\/]+youtube\.com/)) {
+          total--;
+          'http://www.youtube.com/watch?v=XUeyVzzts-M&feature=youtube_gdata'.match(/v=((\d|\w|-)+)/)
+          var yt = $('')
         } else {
           total--;
           done();
