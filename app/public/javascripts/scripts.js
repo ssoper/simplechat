@@ -84,8 +84,14 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         } else if (word.match(/http:\/\/[^\/]+youtube\.com/)) {
           total--;
-          'http://www.youtube.com/watch?v=XUeyVzzts-M&feature=youtube_gdata'.match(/v=((\d|\w|-)+)/)
-          var yt = $('')
+          var width = 320,
+              height = 145,
+              href = 'https://www.youtube.com/v/' + word.match(/v=((\d|\w|-)+)/)[1] + '?version=3',
+              youtube = $('<object>').attr({ width: width, height: height }).append(
+                          $('<param>').attr({ name: 'movie', value: href }),
+                          $('<param>').attr({ name: 'allowScriptAccess', value: 'always' }),
+                          $('<embed>').attr({ src: href, type: 'application/x-shockwave-flash', allowscriptaccess: 'always', width: width, height: height }))
+          done({ media: youtube, width: width, height: height });
         } else {
           total--;
           done();
